@@ -259,5 +259,28 @@
 			</outerBoundaryIs>
 		</Polygon>
 	</Placemark>
+	<Placemark id="0E0CFA65751905B8074F">
+		<name>potager</name>
+		<LookAt>
+			<longitude>2.172530852870003</longitude>
+			<latitude>48.70978512272329</latitude>
+			<altitude>154.1665993538791</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>34.99976059727394</gx:fovy>
+			<range>420.1274568492954</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0A1B940647190579E8B8</styleUrl>
+		<Polygon>
+			<outerBoundaryIs>
+				<LinearRing>
+					<coordinates>
+						2.174189618568181,48.71020534609907,152.2474544346854 2.174205504978048,48.7099314754586,152.9069908773305 2.174632748571173,48.70995115033785,152.4836978072904 2.174700027279297,48.71016859203554,152.355324023287 2.174189618568181,48.71020534609907,152.2474544346854 
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+		</Polygon>
+	</Placemark>
 </Document>
 </kml>

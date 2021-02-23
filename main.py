@@ -30,12 +30,31 @@ def has_collision():
                     poly_valid.append(polygon)
                 elif not already_valid(polygon):
                     is_valid = True
+                    intersects_with = [polygon]
                     for v in poly_valid:
-                        print("ok", polygon["poly"] != v['poly'] and not polygon["poly"].intersects(v['poly']))
-                        if polygon["poly"] == v['poly'] or polygon["poly"].intersects(v['poly']):
+                        intersects = polygon["poly"].intersects(v['poly'])
+                        if polygon["poly"] == v['poly'] or intersects:
                             is_valid = False
-                    if is_valid:
-                        poly_valid.append(polygon)
+                            if intersects:
+                                intersects_with.append(v)
+                    keep_most_demanded(intersects_with)
+
+
+def keep_most_demanded(shape_with_collison):
+    global poly_valid
+    max_shape = shape_with_collison[0]
+    for shape in shape_with_collison:
+        if demandes_map[shape['name']] > demandes_map[max_shape['name']]:
+            max_shape = shape
+    shapes_to_remove = []
+    for shape_to_remove in shape_with_collison:
+        if shape_to_remove['poly'] != max_shape['poly']:
+            shapes_to_remove.append(shape_to_remove['poly'])
+    new_valid = [max_shape]
+    for valid in poly_valid:
+        if valid['poly'] not in shapes_to_remove and max_shape['poly'] != valid['poly']:
+            new_valid.append(valid)
+    poly_valid = new_valid
 
 
 def already_valid(polygon):
