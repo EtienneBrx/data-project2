@@ -22,22 +22,35 @@ def has_collision():
     # parcours de toutes les demandes
     for key in sorted(demandes_map, key=demandes_map.get, reverse=True):
         # parcours des formes correspondantes
-        for j in range(0, len(polygones_shapely)):
-            if str(polygones_shapely[j]["name"]).lower() == key:
+        for polygon in polygones_shapely:
+            if str(polygon["name"]).lower() == key:
                 # parcours des polygones placés
+                print("poly", polygon)
                 if len(poly_valid) <= 0:
-                    poly_valid.append(polygones_shapely[j])
-                else:
+                    poly_valid.append(polygon)
+                elif not already_valid(polygon):
+                    is_valid = True
                     for v in poly_valid:
-                        if not polygones_shapely[j]["poly"].overlaps(v):
-                            poly_valid.append(polygones_shapely[j])
+                        print("ok", polygon["poly"] != v['poly'] and not polygon["poly"].intersects(v['poly']))
+                        if polygon["poly"] == v['poly'] or polygon["poly"].intersects(v['poly']):
+                            is_valid = False
+                    if is_valid:
+                        poly_valid.append(polygon)
+
+
+def already_valid(polygon):
+    for poly in poly_valid:
+        if poly['poly'] == polygon['poly']:
+            return True
+    return False
 
 
 if __name__ == '__main__':
     FICHIER_1 = "Polytech_mymap.xml"
     FICHIER_2 = "Polytech_earth.kml"
+    FICHIER_3 = "simple.kml"
 
-    with open("Projet_2_-_Echange_de_donnees.kml") as file:
+    with open(FICHIER_3) as file:
         doc = parser.parse(file).getroot()
         print('doc opened')
 
@@ -72,11 +85,13 @@ if __name__ == '__main__':
                     "name": str(pm.name).lower()
                 })
 
+        print(demandes_map)
+
         # Sélection emplacements
         has_collision()
-
-        print(demandes_map)
-        print(len(polygones))
+        print(len(polygones_shapely))
+        print(polygones_shapely)
+        print(len(poly_valid))
         print(poly_valid)
 
 
