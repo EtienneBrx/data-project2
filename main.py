@@ -64,30 +64,40 @@ def already_valid(polygon):
     return False
 
 
+# Valide le fichier selon le bon schéma
+def validate_file(file):
+    schema_ogc = Schema("ogckml22.xsd")
+    schema_gx = Schema("kml22gx.xsd")
+    if schema_ogc.validate(doc):
+        print("Fichier ogc")
+    elif schema_gx.validate(doc):
+        print("Fichier gx")
+    else:
+        print("Erreur format fichier")
+        # schema_gx.assertValid(doc)
+
+
 if __name__ == '__main__':
     FICHIER_1 = "Polytech_mymap.xml"
     FICHIER_2 = "Polytech_earth.kml"
     FICHIER_3 = "simple.kml"
+    FICHIER_4 = "Carte 6.kml"
+    FICHIER_5 = "Carte 7.kml"
 
-    with open(FICHIER_3) as file:
+    with open(FICHIER_4) as file:
         doc = parser.parse(file).getroot()
         print('doc opened')
+        validate_file(file)
 
-        schema_ogc = Schema("ogckml22.xsd")
-        schema_gx = Schema("kml22gx.xsd")
-
-        if schema_ogc.validate(doc):
-            print("Fichier ogc")
-        elif schema_gx.validate(doc):
-            print("Fichier gx")
+        if hasattr(doc.Document, 'Placemark'):
+            placemarks = doc.Document.Placemark
         else:
-            print("Erreur format fichier")
-            # schema_gx.assertValid(doc)
+            placemarks = doc.Document.Folder.Placemark
 
         # print(etree.tostring(doc))
         print(doc.Document.name)
 
-        for pm in doc.Document.Placemark:
+        for pm in placemarks:
             # print(pm.name)
             if str(pm.name).lower() in demandes_map.keys():
                 demandes_map[str(pm.name).lower()] += 1
@@ -101,7 +111,8 @@ if __name__ == '__main__':
                     coord_tuples.append((float(floats[0]), float(floats[1])))
                 polygones_shapely.append({
                     "poly": LinearRing(coord_tuples),
-                    "name": str(pm.name).lower()
+                    "name": str(pm.name).lower(),
+                    "placemark": pm
                 })
 
         print(demandes_map)
@@ -113,4 +124,13 @@ if __name__ == '__main__':
         print(len(poly_valid))
         print(poly_valid)
 
+    # Écriture fichier
+    with open('Carte_résulats.kml', 'w') as output:
+        output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        output.write('<kml>\n<Document>\n')
+        for poly_result in poly_valid:
+            output.write(etree.tostring(poly_result['placemark'], pretty_print=True).decode("utf-8"))
+            output.write('\n')
+        output.write('\n</Document>\n</kml>')
 
+    print('finished')
