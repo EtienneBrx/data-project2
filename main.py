@@ -77,6 +77,29 @@ def validate_file(file):
         # schema_gx.assertValid(doc)
 
 
+def write_file(doc):
+    with open('Carte_résulats.kml', 'w') as output:
+        output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        output.write('<kml>\n<Document>\n')
+        # Écrit les styles
+        for style_map in doc.Document.StyleMap:
+            output.write(etree.tostring(style_map, pretty_print=True).decode("utf-8"))
+            output.write('\n')
+        if hasattr(doc.Document, 'Style'):
+            for style_tag in doc.Document.Style:
+                output.write(etree.tostring(style_tag, pretty_print=True).decode("utf-8"))
+                output.write('\n')
+        elif hasattr(doc.Document, 'gx:CascadingStyle'):
+            for style_tag in doc.Document['gx:CascadingStyle']:
+                output.write(etree.tostring(style_tag, pretty_print=True).decode("utf-8"))
+                output.write('\n')
+        # Écrit les placemarks
+        for poly_result in poly_valid:
+            output.write(etree.tostring(poly_result['placemark'], pretty_print=True).decode("utf-8"))
+            output.write('\n')
+        output.write('\n</Document>\n</kml>')
+
+
 if __name__ == '__main__':
     FICHIER_1 = "Polytech_mymap.xml"
     FICHIER_2 = "Polytech_earth.kml"
@@ -84,18 +107,18 @@ if __name__ == '__main__':
     FICHIER_4 = "Carte 6.kml"
     FICHIER_5 = "Carte 7.kml"
 
-    with open(FICHIER_4) as file:
+    with open(FICHIER_3) as file:
         doc = parser.parse(file).getroot()
-        print('doc opened')
+        print('file opened: ' + file.name)
         validate_file(file)
+        print('document: ' + doc.Document.name)
+        # print(etree.tostring(doc, pretty_print=True).decode("utf-8"))
 
+        # Parcours des formes dans le fichier kml
         if hasattr(doc.Document, 'Placemark'):
             placemarks = doc.Document.Placemark
         else:
             placemarks = doc.Document.Folder.Placemark
-
-        # print(etree.tostring(doc))
-        print(doc.Document.name)
 
         for pm in placemarks:
             # print(pm.name)
@@ -124,13 +147,6 @@ if __name__ == '__main__':
         print(len(poly_valid))
         print(poly_valid)
 
-    # Écriture fichier
-    with open('Carte_résulats.kml', 'w') as output:
-        output.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        output.write('<kml>\n<Document>\n')
-        for poly_result in poly_valid:
-            output.write(etree.tostring(poly_result['placemark'], pretty_print=True).decode("utf-8"))
-            output.write('\n')
-        output.write('\n</Document>\n</kml>')
-
-    print('finished')
+        # Écriture fichier
+        write_file(doc)
+        print('finished')
